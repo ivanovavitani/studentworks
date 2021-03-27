@@ -1,6 +1,9 @@
 from openpyxl import load_workbook
+import geojson
+import random
 
-def open():
+
+def opener():
     exl = load_workbook('data.xlsx')
     list = exl['Лист1']
     id = []
@@ -18,7 +21,23 @@ def open():
     return id, x, y
 
 
-id, x, y = open()
+id, x, y = opener()
 coordinates = zip(y, x)
 coordinates = list(coordinates)
+
+features = []
+for i in coordinates:
+    width = [6, 10, 12]
+    speed = [60, 80, 100, 120]
+    type_of_surface = ["ground","city", "highway", "expressway"]
+    lanes = [2, 4]
+    features.append(geojson.Feature(geometry=geojson.Point(i), properties={"width":random.choice(width),
+                                                                           "speed":random.choice(speed),
+                                                                           "type of surface":random.choice(type_of_surface),
+                                                                           "lanes":random.choice(lanes)}))
+collection = geojson.FeatureCollection(features=features)
+
+with open('Points.geojson', 'w') as file:
+    geojson.dump(collection, file)
+
 
