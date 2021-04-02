@@ -21,6 +21,18 @@ def opener():
         y.append(float(val))
     return id, x, y
 
+def sample(property, type):
+    client = MongoClient('localhost', 27017)
+    db = client['MyDB']
+    collection_currency = db['MyColl']
+    # Создаём пустые фичи
+    new_features = []
+    for i in collection_currency.find({property: type}):
+        new_features.append(geojson.Feature(geometry=i['geometry'], properties=i['properties']))
+    new_feature_collection = geojson.FeatureCollection(features=new_features)
+    # Генерируем файл выборки с именем Sample + random
+    with open('Sample'+str(random.choice(range(1000,10000))), 'w') as r:
+        geojson.dump(new_feature_collection, r)
 
 id, x, y = opener()
 coordinates = zip(y, x)
@@ -47,15 +59,19 @@ client = MongoClient('localhost', 27017)
 db = client['MyDB']
 collection_currency = db['MyColl']
 
-#with open('Points_for_DB.json') as f:
-    #file_data = geojson.load(f)
-#collection_currency.insert_many(file_data)
+# Подключение 1 раз, потом шарп
+# with open('Points_for_DB.json') as f:
+    # file_data = geojson.load(f)
+# collection_currency.insert_many(file_data)
 
-# Это тестовая выборка из MongoDB
-new_features = []
-for i in collection_currency.find({'properties.speed': 100}):
-    new_features.append(geojson.Feature(geometry=i['geometry'], properties=i['properties']))
-new_feature_collection = geojson.FeatureCollection(features=new_features)
+sample('properties.width', 10)
+sample('properties.speed', 80)
+sample('properties.type of surface', 'city')
+sample('properties.width', 12)
+sample('properties.type of surface', 'ground')
+sample('properties.lanes',4)
+sample('properties.type of surface', 'highway')
+sample('properties.lanes', 2)
+sample('properties.speed', 60)
+sample('properties.speed', 120)
 
-with open('Points#test.geojson', 'w') as r:
-    geojson.dump(new_feature_collection, r)
